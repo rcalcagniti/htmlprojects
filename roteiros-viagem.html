@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F1F4F7">
+<title>Roteiros de viagem</title>
+<style>
+:root {
+  --bg: #F1F4F7; --surface: #FFFFFF; --sunk: #E5EAF0; --ink: #14213D; --muted: #5B6679; --line: #D6DDE6;
+  --accent: #D9573B; --accent-ink: #FFFFFF; --accent-soft: #FBE5DF;
+  --map: #1F7A6D; --map-soft: #DDF0EC;
+  --ok: #1F7A6D; --warn: #9A6212; --warn-soft: #F7EBD7; --bad: #B42318; --bad-soft: #F9E1DE;
+  --c-passeio: #D9573B; --c-comida: #C8871E; --c-transporte: #3D6FB6; --c-hospedagem: #7A4FB5; --c-compras: #B03A78; --c-outro: #5B6679;
+  --r: 16px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1524; --surface: #172036; --sunk: #202B45; --ink: #E8ECF4; --muted: #9BA6BB; --line: #2A3653;
+    --accent: #F07A5E; --accent-ink: #1A0B06; --accent-soft: #3B211B; --map: #5CC7B5; --map-soft: #16362F;
+    --ok: #5CC7B5; --warn: #E7B266; --warn-soft: #3A2C16; --bad: #F08A7E; --bad-soft: #43201C;
+    --c-passeio: #F07A5E; --c-comida: #E7B266; --c-transporte: #7FA8E8; --c-hospedagem: #B394E6; --c-compras: #E77DB6; --c-outro: #9BA6BB;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1524; --surface: #172036; --sunk: #202B45; --ink: #E8ECF4; --muted: #9BA6BB; --line: #2A3653;
+  --accent: #F07A5E; --accent-ink: #1A0B06; --accent-soft: #3B211B; --map: #5CC7B5; --map-soft: #16362F;
+  --ok: #5CC7B5; --warn: #E7B266; --warn-soft: #3A2C16; --bad: #F08A7E; --bad-soft: #43201C;
+  --c-passeio: #F07A5E; --c-comida: #E7B266; --c-transporte: #7FA8E8; --c-hospedagem: #B394E6; --c-compras: #E77DB6; --c-outro: #9BA6BB;
+  color-scheme: dark;
+}
+:root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: inherit; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-size: 16px; line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+a { color: inherit; }
+
+.wrap { max-width: 600px; margin: 0 auto; padding: 0 14px 120px; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+
+/* topo */
+.top { display: flex; align-items: center; gap: 10px; padding: 14px 2px 8px; }
+.top h1 { margin: 0; font-size: 25px; letter-spacing: -.02em; line-height: 1.15; flex: 1; min-width: 0; }
+.top h1 small { display: block; font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.iconbtn { border: 0; background: var(--surface); width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; cursor: pointer; flex: none; color: var(--ink); text-decoration: none; }
+.iconbtn svg, .ico svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.btn { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 13px; padding: 13px 16px; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.btn.map { background: var(--map-soft); color: var(--map); }
+.btn.danger { background: var(--bad-soft); color: var(--bad); }
+.btn.block { display: flex; width: 100%; }
+.btn.sm { padding: 8px 12px; font-size: 14px; border-radius: 10px; }
+.btn svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn:disabled { opacity: .5; }
+
+/* lista de viagens */
+.trip-card { display: block; width: 100%; text-align: left; border: 0; background: var(--surface); border-radius: 20px; padding: 18px 18px 16px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; }
+.trip-card .dest { font-size: 24px; font-weight: 750; letter-spacing: -.02em; line-height: 1.15; overflow-wrap: anywhere; }
+.trip-card .when { color: var(--muted); font-size: 14.5px; margin-top: 3px; }
+.trip-card .count { position: absolute; top: 16px; right: 16px; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.trip-card .count.now { background: var(--map-soft); color: var(--map); }
+.trip-card .count.past { background: var(--sunk); color: var(--muted); }
+.trip-card .dest { padding-right: 96px; }
+.meters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.meter .bar { height: 5px; background: var(--sunk); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+.meter .bar i { display: block; height: 100%; background: var(--map); }
+.meter .bar i.over { background: var(--bad); }
+.empty { text-align: center; padding: 48px 18px; color: var(--muted); }
+.empty b { display: block; color: var(--ink); font-size: 19px; margin-bottom: 6px; }
+.empty .btn { margin-top: 18px; }
+
+/* navegação inferior */
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 7; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+nav.tabs .in { max-width: 600px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+nav.tabs button { border: 0; background: none; height: 62px; font-size: 12.5px; font-weight: 650; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; }
+nav.tabs button svg { width: 23px; height: 23px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+nav.tabs button[aria-current=page] { color: var(--accent); }
+.fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 6; border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 15px 20px; font-weight: 750; font-size: 16px; box-shadow: 0 6px 20px rgba(20,33,61,.22); cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.fab svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; }
+.home-fab { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+
+/* faixa de dias */
+.daystrip { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 4; background: var(--bg); margin: 0 -14px; padding: 6px 14px 10px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.daystrip::-webkit-scrollbar { display: none; }
+.daychip { flex: none; scroll-snap-align: start; border: 0; background: var(--surface); border-radius: 14px; padding: 8px 12px; min-width: 64px; text-align: center; cursor: pointer; }
+.daychip b { display: block; font-size: 18px; font-weight: 750; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.daychip span { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: lowercase; }
+.daychip[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.daychip[aria-pressed=true] span { color: inherit; opacity: .8; }
+.daychip.today:not([aria-pressed=true]) { box-shadow: inset 0 0 0 2px var(--accent); }
+
+.dayhead { display: flex; align-items: flex-start; gap: 10px; margin: 6px 2px 14px; }
+.dayhead .t { flex: 1; min-width: 0; }
+.dayhead h2 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+.dayhead p { margin: 2px 0 0; color: var(--muted); font-size: 14.5px; }
+.dayhead .edit { border: 0; background: none; color: var(--muted); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 4px 0; flex: none; }
+
+/* linha do tempo */
+.timeline { position: relative; padding-left: 26px; }
+.timeline::before { content: ""; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 2px; background: var(--line); border-radius: 2px; }
+.item { position: relative; background: var(--surface); border-radius: var(--r); padding: 13px 14px; margin-bottom: 10px; }
+.item::before { content: ""; position: absolute; left: -24px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 3px solid var(--cat, var(--c-outro)); }
+.item.done { opacity: .6; }
+.item.done::before { background: var(--cat); }
+.item-top { display: flex; gap: 10px; align-items: flex-start; }
+.item-top .time { font-weight: 750; font-variant-numeric: tabular-nums; min-width: 44px; }
+.item-top .time.none { color: var(--muted); font-weight: 600; font-size: 14px; }
+.item-top .what { flex: 1; min-width: 0; cursor: pointer; }
+.item-top .what b { display: block; font-weight: 650; overflow-wrap: anywhere; }
+.item.done .what b { text-decoration: line-through; }
+.item-top .what span { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.check { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--line); background: none; flex: none; cursor: pointer; display: grid; place-items: center; }
+.check svg { width: 16px; height: 16px; stroke: var(--bg); fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.item.done .check { background: var(--map); border-color: var(--map); }
+.item-bottom { display: flex; gap: 8px; align-items: center; margin-top: 10px; padding-left: 54px; flex-wrap: wrap; }
+.tag { font-size: 12.5px; font-weight: 650; padding: 3px 9px; border-radius: 999px; background: var(--sunk); color: var(--cat, var(--muted)); }
+.maplink { display: inline-flex; align-items: center; gap: 5px; font-size: 13.5px; font-weight: 650; color: var(--map); background: var(--map-soft); padding: 5px 10px; border-radius: 999px; text-decoration: none; }
+.maplink svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.item .note { margin: 8px 0 0 54px; font-size: 14px; color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.day-actions { display: flex; gap: 8px; margin: 14px 0 0; }
+.day-actions .btn { flex: 1; }
+
+/* cartões gerais */
+.card { background: var(--surface); border-radius: var(--r); padding: 16px; margin-bottom: 12px; }
+.card h3 { margin: 0 0 10px; font-size: 16px; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.stat { background: var(--surface); border-radius: var(--r); padding: 14px; }
+.stat span { font-size: 13px; color: var(--muted); font-weight: 600; }
+.stat b { display: block; font-size: 21px; font-weight: 750; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-top: 2px; overflow-wrap: anywhere; }
+.stat.big { grid-column: 1 / -1; }
+.stat.big b { font-size: 30px; }
+.stat .bar { height: 7px; background: var(--sunk); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+.stat .bar i { display: block; height: 100%; background: var(--map); }
+.stat .bar i.over { background: var(--bad); }
+.catrow { display: grid; grid-template-columns: 104px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 14.5px; padding: 5px 0; }
+.catrow .bar { height: 8px; background: var(--sunk); border-radius: 4px; overflow: hidden; }
+.catrow .bar i { display: block; height: 100%; border-radius: 4px; background: var(--cat); }
+.catrow b { font-variant-numeric: tabular-nums; font-weight: 650; }
+.list { background: var(--surface); border-radius: var(--r); overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); width: 100%; text-align: left; background: none; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; }
+.row:last-child { border-bottom: 0; }
+.row .main { flex: 1; min-width: 0; }
+.row .main b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .main span { font-size: 13.5px; color: var(--muted); }
+.row .val { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.row .val small { display: block; font-weight: 500; color: var(--muted); font-size: 12.5px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cat); flex: none; }
+.section-title { font-size: 15px; font-weight: 750; margin: 20px 2px 8px; display: flex; align-items: center; gap: 8px; }
+.section-title span { color: var(--muted); font-weight: 600; font-size: 13.5px; margin-left: auto; }
+
+/* checklist */
+.ck { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.ck:last-child { border-bottom: 0; }
+.ck input { width: 22px; height: 22px; accent-color: var(--map); flex: none; }
+.ck .txt { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.ck.on .txt { color: var(--muted); text-decoration: line-through; }
+.ck .del { border: 0; background: none; color: var(--muted); font-size: 20px; line-height: 1; padding: 2px 6px; cursor: pointer; }
+.addline { display: flex; gap: 8px; padding: 10px 12px; }
+.addline input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: var(--bg); }
+
+/* menu */
+.menu-btn { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; border: 0; background: var(--surface); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; text-decoration: none; color: inherit; }
+.menu-btn b { display: block; }
+.menu-btn .sub { font-size: 14px; color: var(--muted); }
+.menu-btn .ico { width: 42px; height: 42px; border-radius: 12px; background: var(--sunk); display: grid; place-items: center; flex: none; color: var(--ink); }
+.menu-btn.danger b { color: var(--bad); }
+.info { background: var(--surface); border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px; }
+.info h4 { margin: 0 0 4px; font-size: 13.5px; color: var(--muted); font-weight: 650; }
+.info p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* folhas */
+.backdrop { position: fixed; inset: 0; background: rgba(9,14,28,.48); z-index: 20; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; background: var(--bg); border-radius: 22px 22px 0 0; max-height: 92vh; max-height: 92dvh; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.sheet-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px 8px; }
+.sheet-head h2 { font-size: 19px; margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.close { border: 0; background: var(--sunk); width: 36px; height: 36px; border-radius: 50%; font-size: 21px; line-height: 1; cursor: pointer; color: var(--muted); flex: none; }
+.sheet-body { overflow: auto; padding: 4px 18px 16px; }
+.sheet-foot { padding: 12px 18px 14px; border-top: 1px solid var(--line); display: flex; gap: 10px; }
+.sheet-foot > * { flex: 1; }
+@media (prefers-reduced-motion: no-preference) { .sheet { animation: up .22s ease-out; } @keyframes up { from { transform: translateY(28px); opacity: .5; } } }
+
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field > span { font-size: 14px; font-weight: 650; color: var(--muted); }
+.field input, .field select, .field textarea { width: 100%; padding: 12px 13px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: 16px; min-width: 0; }
+.field textarea { min-height: 90px; resize: vertical; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.three { display: grid; grid-template-columns: 1.3fr 1fr; gap: 10px; }
+.hint { color: var(--muted); font-size: 14px; margin: -6px 0 14px; }
+.cats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.cats label { cursor: pointer; }
+.cats input { position: absolute; opacity: 0; pointer-events: none; }
+.cats span { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 14.5px; font-weight: 600; }
+.cats span::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--cat); }
+.cats input:checked + span { border-color: var(--cat); box-shadow: inset 0 0 0 1px var(--cat); }
+.cats input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.switch { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border-radius: 12px; margin-bottom: 14px; cursor: pointer; }
+.switch .main { flex: 1; }
+.switch .main small { display: block; color: var(--muted); font-size: 13px; }
+.switch input { width: 22px; height: 22px; accent-color: var(--map); flex: none; }
+.sync { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; margin: -2px 2px 8px; color: var(--muted); }
+.sync i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
+.sync.wait i { background: var(--warn); }
+.shared-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: var(--map); margin-top: 8px; }
+.shared-tag svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.readonly-bar { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 12px 14px; margin: 4px 0 14px; display: flex; gap: 10px; align-items: center; font-size: 14.5px; }
+.readonly-bar .btn { margin-left: auto; flex: none; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(146px + env(safe-area-inset-bottom, 0px)); z-index: 40; background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 12px; font-size: 15px; max-width: calc(100vw - 32px); text-align: center; }
+body.has-sheet .toast { bottom: auto; top: calc(14px + env(safe-area-inset-top, 0px)); }
+
+/* impressão / PDF */
+#print { display: none; }
+@media print {
+  @page { margin: 14mm; }
+  body { background: #fff; color: #111; font-size: 11.5pt; }
+  body > *:not(#print) { display: none !important; }
+  #print { display: block; }
+  #print h1 { font-size: 22pt; margin: 0 0 2pt; }
+  #print .sub { color: #555; margin: 0 0 14pt; }
+  #print h2 { font-size: 13.5pt; margin: 16pt 0 6pt; padding-bottom: 3pt; border-bottom: 1.5pt solid #111; break-after: avoid; }
+  #print table { width: 100%; border-collapse: collapse; }
+  #print td { padding: 5pt 6pt 5pt 0; vertical-align: top; border-bottom: .5pt solid #ccc; }
+  #print td.t { width: 44pt; font-weight: 700; white-space: nowrap; }
+  #print td.c { width: 70pt; text-align: right; white-space: nowrap; }
+  #print tr { break-inside: avoid; }
+  #print .n { color: #555; font-size: 10pt; }
+  #print a { color: #1F5E9E; }
+  #print .ck-cols { columns: 2; column-gap: 20pt; }
+  #print .ck-cols div { break-inside: avoid; margin-bottom: 8pt; }
+  #print .ck-cols p { margin: 0 0 2pt; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav class="tabs" id="tabs" hidden><div class="in">
+  <button data-tab="roteiro"><svg viewBox="0 0 24 24"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg>Roteiro</button>
+  <button data-tab="gastos"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/></svg>Gastos</button>
+  <button data-tab="checklist"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>Checklist</button>
+  <button data-tab="mais"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>Mais</button>
+</div></nav>
+<div id="print"></div>
+<input type="file" id="importInput" accept=".json,application/json" hidden>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+'use strict';
+/* =================================================================
+   Dados (ficam salvos neste navegador)
+   ================================================================= */
+const STORE = 'roteiros-viagem-v1';
+function load() { try { return Object.assign({ trips: [] }, JSON.parse(localStorage.getItem(STORE) || '{}')); } catch (e) { return { trips: [] }; } }
+function save() { try { localStorage.setItem(STORE, JSON.stringify(DB)); } catch (e) { toast('Não foi possível salvar neste navegador.'); } }
+let DB = load();
+const V = { trip: null, tab: 'roteiro', day: 0, shared: null };
+
+const CATS = {
+  passeio: 'Passeio', comida: 'Comida', transporte: 'Transporte', hospedagem: 'Hospedagem', compras: 'Compras', outro: 'Outro',
+};
+const CURRENCIES = ['BRL', 'USD', 'EUR', 'GBP', 'ARS', 'CLP', 'UYU', 'MXN', 'COP', 'PEN', 'CAD', 'AUD', 'JPY', 'CHF', 'CNY', 'THB', 'ZAR'];
+
+function checklistPadrao(intl) {
+  const L = {
+    'Documentos': ['RG ou CNH', intl && 'Passaporte (validade de 6 meses ou mais)', intl && 'Visto, se o destino exigir', intl && 'Seguro viagem', intl && 'Certificado de vacina (febre amarela)', 'Passagens ou cartões de embarque', 'Reservas de hospedagem', intl && 'Permissão internacional para dirigir, se for alugar carro', 'Cópias digitais dos documentos'],
+    'Dinheiro': ['Cartões de crédito e débito', 'Dinheiro em espécie', intl && 'Moeda local ou cartão pré-pago'],
+    'Mala': ['Roupas para todos os dias', 'Roupa íntima e meias', 'Pijama', 'Calçado confortável para caminhar', 'Casaco', 'Itens de higiene', 'Remédios de uso contínuo', 'Protetor solar', 'Óculos de sol', 'Carregador e cabo do celular', intl && 'Adaptador de tomada', 'Carregador portátil', 'Fones de ouvido'],
+    'Antes de sair': ['Check-in online', intl ? 'Chip, eSIM ou roaming internacional' : 'Plano de dados do celular', 'Baixar mapas offline', 'Deixar roteiro e contatos com alguém de confiança', 'Conferir horário do transporte até o aeroporto ou rodoviária', 'Desligar aparelhos e fechar registros de casa'],
+  };
+  const out = [];
+  Object.entries(L).forEach(([sec, items]) => items.filter(Boolean).forEach(t => out.push({ id: uid(), section: sec, text: t, done: false })));
+  return out;
+}
+
+/* =================================================================
+   Utilitários
+   ================================================================= */
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+function toast(m, ms = 2800) { const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, ms); }
+const DOW = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+const DOWL = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+const MON = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const MONL = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const parseD = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, m - 1, d); };
+const isoD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const addDays = (s, n) => { const d = parseD(s); d.setDate(d.getDate() + n); return isoD(d); };
+const diffDays = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
+const todayIso = () => isoD(new Date());
+const nDays = t => Math.max(1, diffDays(t.start, t.end) + 1);
+function periodo(t) {
+  const a = parseD(t.start), b = parseD(t.end);
+  if (t.start === t.end) return `${a.getDate()} de ${MONL[a.getMonth()]} de ${a.getFullYear()}`;
+  if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()) return `${a.getDate()} a ${b.getDate()} de ${MONL[a.getMonth()]} de ${a.getFullYear()}`;
+  if (a.getFullYear() === b.getFullYear()) return `${a.getDate()} de ${MON[a.getMonth()]} a ${b.getDate()} de ${MON[b.getMonth()]} de ${a.getFullYear()}`;
+  return `${a.getDate()}/${a.getMonth() + 1}/${a.getFullYear()} a ${b.getDate()}/${b.getMonth() + 1}/${b.getFullYear()}`;
+}
+function money(v, cur) {
+  try { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: cur || 'BRL', maximumFractionDigits: Math.abs(v) >= 1000 ? 0 : 2 }).format(v || 0); }
+  catch (e) { return (cur || '') + ' ' + (v || 0).toFixed(2); }
+}
+function parseMoney(s) {
+  let t = String(s || '').trim().replace(/[^\d.,-]/g, '');
+  if (!t) return 0;
+  const lc = t.lastIndexOf(','), ld = t.lastIndexOf('.');
+  if (lc >= 0 && ld >= 0) t = lc > ld ? t.replace(/\./g, '').replace(',', '.') : t.replace(/,/g, '');   // 1.234,56 ou 1,234.56
+  else if (lc >= 0) t = (t.match(/,/g).length > 1 ? t.replace(/,/g, '') : t.replace(',', '.'));          // vírgula = decimal
+  else if (ld >= 0) { const parts = t.split('.'); if (parts.length > 2 || (parts[1].length === 3 && !/^-?0$/.test(parts[0]))) t = t.replace(/\./g, ''); } // 1.234 = mil
+  const v = Number(t); return isFinite(v) ? v : 0;
+}
+const fmtInput = v => v ? String(Math.round(v * 1e6) / 1e6).replace('.', ',') : '';
+
+/** Converte para a moeda principal da viagem. */
+function toMain(t, v, cur) { if (!cur || cur === t.currency) return v || 0; if (cur === t.localCurrency && t.rate > 0) return (v || 0) * t.rate; return v || 0; }
+
+function mapsUrl(t, item) {
+  let q = (item.place || '').trim() || (item.title || '').trim();
+  if (!q) return '';
+  if (t.destination && !q.toLowerCase().includes(t.destination.toLowerCase().split(',')[0].trim())) q += ', ' + t.destination;
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+}
+function routeUrl(t, items) {
+  const pts = items.filter(i => i.place || i.title).map(i => { let q = (i.place || i.title).trim(); if (t.destination && !q.toLowerCase().includes(t.destination.toLowerCase().split(',')[0].trim())) q += ', ' + t.destination; return q; });
+  if (pts.length < 2) return '';
+  const origin = pts[0], dest = pts[pts.length - 1], way = pts.slice(1, -1).slice(0, 9);
+  return 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(dest) + (way.length ? '&waypoints=' + encodeURIComponent(way.join('|')) : '');
+}
+
+const ICON = {
+  pin: '<svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  route: '<svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  back: '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  share: '<svg viewBox="0 0 24 24"><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>',
+  pdf: '<svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4.5A1.5 1.5 0 0 1 3 16.5v-5A1.5 1.5 0 0 1 4.5 10h15a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5H18"/><path d="M6 14h12v7H6z"/></svg>',
+  edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>',
+  copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+  file: '<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v5M9.5 14.5 12 17l2.5-2.5"/></svg>',
+  trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
+  home: '<svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg>',
+  people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.8-3.2 3.2-5 6-5s5.2 1.8 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.3.2 3.9 1.8 4.5 4.5"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/></svg>',
+};
+
+/* =================================================================
+   Folhas (bottom sheets)
+   ================================================================= */
+const stack = [];
+function sheet(title, body, foot, mount) {
+  const bd = document.createElement('div'); bd.className = 'backdrop';
+  const sh = document.createElement('div'); sh.className = 'sheet'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true'); sh.setAttribute('aria-label', title);
+  sh.innerHTML = `<div class="sheet-head"><h2>${esc(title)}</h2><button class="close" aria-label="Fechar">×</button></div><div class="sheet-body">${body}</div>${foot ? `<div class="sheet-foot">${foot}</div>` : ''}`;
+  document.body.append(bd, sh); stack.push({ bd, sh });
+  bd.onclick = closeSheet; sh.querySelector('.close').onclick = closeSheet;
+  document.body.style.overflow = 'hidden'; document.body.classList.add('has-sheet');
+  mount && mount(sh);
+  const first = sh.querySelector('input:not([type=checkbox]):not([type=radio]), textarea');
+  if (first && !first.value && matchMedia('(pointer:fine)').matches) first.focus();
+  return sh;
+}
+function closeSheet() { const s = stack.pop(); if (!s) return; s.bd.remove(); s.sh.remove(); if (!stack.length) { document.body.style.overflow = ''; document.body.classList.remove('has-sheet'); } }
+function closeAll() { while (stack.length) closeSheet(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+/* =================================================================
+   Navegação
+   ================================================================= */
+const trip = () => V.shared || DB.trips.find(t => t.id === V.trip);
+const readOnly = () => !!V.shared;
+function openTrip(id) {
+  V.trip = id; V.tab = 'roteiro';
+  const t = trip(); const idx = diffDays(t.start, todayIso());
+  V.day = idx >= 0 && idx < nDays(t) ? idx : 0;
+  render(); window.scrollTo(0, 0);
+}
+function goHome() { V.trip = null; V.shared = null; if (location.hash) history.replaceState(null, '', location.pathname + location.search); render(); window.scrollTo(0, 0); }
+$('#tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (!b) return; V.tab = b.dataset.tab; render(); window.scrollTo(0, 0); };
+
+function render() {
+  const t = trip();
+  $('#tabs').hidden = !t;
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.dataset.tab === V.tab ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  document.querySelectorAll('.fab').forEach(f => f.remove());
+  if (!t) return renderHome();
+  if (V.tab === 'roteiro') renderRoteiro(t);
+  if (V.tab === 'gastos') renderGastos(t);
+  if (V.tab === 'checklist') renderChecklist(t);
+  if (V.tab === 'mais') renderMais(t);
+}
+function fab(label, onClick, extraClass) {
+  if (readOnly()) return;
+  const b = document.createElement('button'); b.className = 'fab ' + (extraClass || ''); b.innerHTML = ICON.plus + esc(label); b.onclick = onClick;
+  document.body.appendChild(b);
+}
+function header(t, sub) {
+  return `<div class="top">
+    <button class="iconbtn" data-act="home" aria-label="Minhas viagens">${ICON.back}</button>
+    <h1>${esc(t.name || t.destination)}<small>${esc(sub || periodo(t))}</small></h1>
+  </div>${t.cloud ? syncBar(t) : ''}${readOnly() ? `<div class="readonly-bar">Roteiro compartilhado, só para visualizar.<button class="btn sm" data-act="saveShared">Salvar no meu app</button></div>` : ''}`;
+}
+
+function syncBar(t) {
+  if (t.cloud.gone) return `<div class="readonly-bar" style="background:var(--bad-soft);color:var(--bad)">Este roteiro foi apagado ou o link foi trocado.<button class="btn sm" data-act="keepLocal">Guardar cópia</button></div>`;
+  const [cls, txt] = t.cloud.pending ? ['wait', 'Salvando…'] : t.cloud.offline ? ['wait', 'Sem conexão: as mudanças sobem quando a internet voltar'] : ['ok', 'Editando em conjunto, tudo salvo'];
+  return `<div class="sync ${cls}"><i></i>${txt}</div>`;
+}
+function opcoesRemover(t) {
+  sheet('Remover roteiro', `
+    <button class="menu-btn" id="rMe"><span><b>Remover só deste aparelho</b><span class="sub">Quem tem o link continua editando</span></span></button>
+    <button class="menu-btn danger" id="rAll"><span><b>Apagar para todos</b><span class="sub">Ninguém mais consegue abrir</span></span></button>`, '', sh => {
+    sh.querySelector('#rMe').onclick = () => { closeAll(); removerCompartilhada(t, false); };
+    sh.querySelector('#rAll').onclick = () => { closeAll(); removerCompartilhada(t, true); };
+  });
+}
+
+/* =================================================================
+   Tela inicial
+   ================================================================= */
+function statusViagem(t) {
+  const hoje = todayIso(), d0 = diffDays(hoje, t.start), d1 = diffDays(hoje, t.end);
+  if (d1 < 0) return { txt: 'Concluída', cls: 'past' };
+  if (d0 <= 0) return { txt: `Dia ${1 - d0} de ${nDays(t)}`, cls: 'now' };
+  if (d0 === 1) return { txt: 'Amanhã', cls: '' };
+  return { txt: `Faltam ${d0} dias`, cls: '' };
+}
+function totais(t) {
+  const plan = Object.values(t.days || {}).flatMap(d => d.items || []).reduce((a, i) => a + toMain(t, i.cost, i.costCur), 0);
+  const gasto = (t.expenses || []).reduce((a, e) => a + toMain(t, e.amount, e.currency), 0);
+  return { plan, gasto };
+}
+function renderHome() {
+  const trips = DB.trips.slice().sort((a, b) => {
+    const pa = diffDays(todayIso(), a.end) < 0, pb = diffDays(todayIso(), b.end) < 0;
+    if (pa !== pb) return pa ? 1 : -1;
+    return pa ? b.start.localeCompare(a.start) : a.start.localeCompare(b.start);
+  });
+  let html = `<div class="top"><h1>Minhas viagens<small>${trips.length ? `${trips.length} ${trips.length === 1 ? 'roteiro' : 'roteiros'}` : 'Planeje o próximo destino'}</small></h1>
+    <button class="iconbtn" data-act="import" aria-label="Importar viagem">${ICON.file}</button></div>`;
+  if (!trips.length) {
+    html += `<div class="empty"><b>Nenhuma viagem ainda</b>Crie um roteiro com os dias, os lugares, o orçamento e a checklist da mala.<br><button class="btn" data-act="newTrip">${ICON.plus}Nova viagem</button></div>`;
+  }
+  for (const t of trips) {
+    const st = statusViagem(t), tot = totais(t);
+    const ck = t.checklist || [], feitos = ck.filter(c => c.done).length;
+    const pct = t.budget ? Math.min(100, tot.gasto / t.budget * 100) : 0;
+    html += `<button class="trip-card" data-open="${esc(t.id)}">
+      <span class="count ${st.cls}">${esc(st.txt)}</span>
+      <div class="dest">${esc(t.name || t.destination)}</div>
+      <div class="when">${esc(periodo(t))}, ${nDays(t)} ${nDays(t) === 1 ? 'dia' : 'dias'}</div>
+      ${t.cloud ? `<div class="shared-tag">${ICON.people}Editando em conjunto</div>` : ''}
+      <div class="meters">
+        <div class="meter">Checklist ${feitos}/${ck.length}<div class="bar"><i style="width:${ck.length ? feitos / ck.length * 100 : 0}%"></i></div></div>
+        <div class="meter">${t.budget ? `${money(tot.gasto, t.currency)} de ${money(t.budget, t.currency)}` : `Gasto ${money(tot.gasto, t.currency)}`}<div class="bar"><i class="${tot.gasto > t.budget && t.budget ? 'over' : ''}" style="width:${pct}%"></i></div></div>
+      </div></button>`;
+  }
+  $('#app').innerHTML = html;
+  if (trips.length) fab('Nova viagem', () => formViagem(null), 'home-fab');
+}
+
+/* =================================================================
+   Roteiro
+   ================================================================= */
+function dia(t, i) { t.days = t.days || {}; return t.days[i] || (t.days[i] = { title: '', items: [] }); }
+function renderRoteiro(t) {
+  const n = nDays(t); if (V.day >= n) V.day = n - 1;
+  const hoje = todayIso();
+  let strip = '<div class="daystrip" id="strip">';
+  for (let i = 0; i < n; i++) {
+    const ds = addDays(t.start, i), d = parseD(ds);
+    strip += `<button class="daychip ${ds === hoje ? 'today' : ''}" data-day="${i}" aria-pressed="${i === V.day}"><span>${DOW[d.getDay()]}</span><b>${d.getDate()}</b><span>dia ${i + 1}</span></button>`;
+  }
+  strip += '</div>';
+  const ds = addDays(t.start, V.day), d = parseD(ds), dd = (t.days || {})[V.day] || { title: '', items: [] };
+  const items = (dd.items || []).slice().sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+  let html = header(t) + strip + `<div class="dayhead"><div class="t"><h2>${esc(dd.title || `Dia ${V.day + 1}`)}</h2><p>${DOWL[d.getDay()]}, ${d.getDate()} de ${MONL[d.getMonth()]}</p></div>${readOnly() ? '' : `<button class="edit" data-act="dayTitle">Nomear dia</button>`}</div>`;
+  if (!items.length) {
+    html += `<div class="empty" style="padding:32px 12px"><b>Dia livre</b>${readOnly() ? '' : 'Adicione passeios, refeições, deslocamentos e reservas.'}</div>`;
+  } else {
+    html += '<div class="timeline">';
+    for (const it of items) {
+      const cat = it.cat || 'outro', m = mapsUrl(t, it);
+      html += `<div class="item ${it.done ? 'done' : ''}" style="--cat:var(--c-${cat})">
+        <div class="item-top">
+          <div class="time ${it.time ? '' : 'none'}">${esc(it.time || '--:--')}</div>
+          <div class="what" data-edit="${esc(it.id)}"><b>${esc(it.title)}</b>${it.place && it.place !== it.title ? `<span>${esc(it.place)}</span>` : ''}</div>
+          ${readOnly() ? '' : `<button class="check" data-done="${esc(it.id)}" aria-label="${it.done ? 'Desmarcar' : 'Marcar como feito'}" aria-pressed="${!!it.done}">${ICON.check}</button>`}
+        </div>
+        <div class="item-bottom">
+          <span class="tag">${esc(CATS[cat])}</span>
+          ${it.cost ? `<span class="tag" style="--cat:var(--ink)">${esc(money(it.cost, it.costCur || t.currency))}</span>` : ''}
+          ${m ? `<a class="maplink" href="${esc(m)}" target="_blank" rel="noopener">${ICON.pin}Maps</a>` : ''}
+        </div>
+        ${it.notes ? `<div class="note">${esc(it.notes)}</div>` : ''}
+      </div>`;
+    }
+    html += '</div>';
+    const r = routeUrl(t, items);
+    if (r) html += `<div class="day-actions"><a class="btn map" href="${esc(r)}" target="_blank" rel="noopener">${ICON.route}Ver rota do dia no Maps</a></div>`;
+  }
+  $('#app').innerHTML = html;
+  const chip = document.querySelector(`#strip [data-day="${V.day}"]`); if (chip) chip.scrollIntoView({ inline: 'center', block: 'nearest' });
+  fab('Atividade', () => formItem(t, null));
+}
+
+function formItem(t, it) {
+  const isNew = !it;
+  it = it ? JSON.parse(JSON.stringify(it)) : { id: uid(), time: '', title: '', place: '', notes: '', cost: 0, costCur: t.currency, cat: 'passeio', done: false };
+  delete it.day;
+  const curOpts = [t.currency, t.localCurrency].filter(Boolean);
+  const n = nDays(t);
+  const body = `
+    <label class="field"><span>O que</span><input id="iTit" value="${esc(it.title)}" placeholder="Ex.: Museu do Louvre" autocomplete="off"></label>
+    <label class="field"><span>Lugar ou endereço (para o Maps)</span><input id="iPlace" value="${esc(it.place)}" placeholder="Deixe vazio para usar o nome acima" autocomplete="off"></label>
+    <div class="two">
+      <label class="field"><span>Horário</span><input id="iTime" type="time" value="${esc(it.time)}"></label>
+      <label class="field"><span>Dia</span><select id="iDay">${Array.from({ length: n }, (_, i) => { const d = parseD(addDays(t.start, i)); return `<option value="${i}" ${i === V.day ? 'selected' : ''}>Dia ${i + 1}, ${d.getDate()}/${d.getMonth() + 1}</option>`; }).join('')}</select></label>
+    </div>
+    <div class="cats" role="radiogroup" aria-label="Categoria">${Object.entries(CATS).map(([k, l]) => `<label style="--cat:var(--c-${k})"><input type="radio" name="iCat" value="${k}" ${it.cat === k ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div>
+    <div class="${curOpts.length > 1 ? 'three' : ''}">
+      <label class="field"><span>Custo previsto</span><input id="iCost" inputmode="decimal" value="${esc(fmtInput(it.cost))}" placeholder="0,00"></label>
+      ${curOpts.length > 1 ? `<label class="field"><span>Moeda</span><select id="iCur">${curOpts.map(c => `<option ${c === (it.costCur || t.currency) ? 'selected' : ''}>${c}</option>`).join('')}</select></label>` : ''}
+    </div>
+    <label class="field"><span>Observações</span><textarea id="iNotes" placeholder="Reserva, horário de funcionamento, ingresso...">${esc(it.notes)}</textarea></label>`;
+  const foot = isNew ? `<button class="btn" id="iSave">Adicionar</button>`
+    : `<button class="btn danger" id="iDel" style="flex:0 0 auto">${ICON.trash}</button><button class="btn ghost" id="iSpend">Registrar gasto</button><button class="btn" id="iSave">Salvar</button>`;
+  sheet(isNew ? 'Nova atividade' : 'Editar atividade', body, foot, sh => {
+    const collect = () => {
+      it.title = sh.querySelector('#iTit').value.trim(); it.place = sh.querySelector('#iPlace').value.trim();
+      it.time = sh.querySelector('#iTime').value; it.notes = sh.querySelector('#iNotes').value.trim();
+      it.cost = parseMoney(sh.querySelector('#iCost').value); it.costCur = sh.querySelector('#iCur') ? sh.querySelector('#iCur').value : t.currency;
+      it.cat = (sh.querySelector('input[name=iCat]:checked') || {}).value || 'outro';
+      return Number(sh.querySelector('#iDay').value);
+    };
+    sh.querySelector('#iSave').onclick = () => {
+      const newDay = collect();
+      if (!it.title) { toast('Dê um nome para a atividade.'); return; }
+      V.day = newDay; closeAll(); Data.putItem(t, it, newDay); toast(isNew ? 'Atividade adicionada.' : 'Atividade salva.');
+    };
+    const del = sh.querySelector('#iDel');
+    if (del) del.onclick = () => { if (!confirm('Apagar esta atividade?')) return; closeAll(); Data.delItem(t, it.id); toast('Atividade apagada.'); };
+    const sp = sh.querySelector('#iSpend');
+    if (sp) sp.onclick = () => { collect(); formGasto(t, null, { desc: it.title, amount: it.cost, currency: it.costCur, cat: it.cat, date: addDays(t.start, V.day) }); };
+  });
+}
+
+function formDia(t) {
+  const d = (t.days || {})[V.day] || { title: '' };
+  sheet(`Dia ${V.day + 1}`, `<label class="field"><span>Nome do dia</span><input id="dTit" value="${esc(d.title)}" placeholder="Ex.: Chegada em Lisboa, Sintra, Praias"></label>`,
+    `<button class="btn" id="dSave">Salvar</button>`, sh => {
+      sh.querySelector('#dSave').onclick = () => { closeSheet(); Data.setDayTitle(t, V.day, sh.querySelector('#dTit').value.trim()); };
+    });
+}
+
+/* =================================================================
+   Gastos
+   ================================================================= */
+function renderGastos(t) {
+  const tot = totais(t), cur = t.currency;
+  const exps = (t.expenses || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.created || 0) - (a.created || 0));
+  const saldo = t.budget ? t.budget - tot.gasto : 0;
+  const pct = t.budget ? Math.min(100, tot.gasto / t.budget * 100) : 0;
+  const diasPassados = Math.min(nDays(t), Math.max(1, diffDays(t.start, todayIso()) + 1));
+  let html = header(t, 'Orçamento e gastos');
+  html += `<div class="stats">
+    <div class="stat big"><span>${t.budget ? (saldo >= 0 ? 'Ainda pode gastar' : 'Acima do orçamento') : 'Total gasto'}</span>
+      <b style="${t.budget && saldo < 0 ? 'color:var(--bad)' : ''}">${money(t.budget ? Math.abs(saldo) : tot.gasto, cur)}</b>
+      ${t.budget ? `<div class="bar"><i class="${saldo < 0 ? 'over' : ''}" style="width:${pct}%"></i></div><p class="muted small" style="margin:8px 0 0">${money(tot.gasto, cur)} gastos de ${money(t.budget, cur)}</p>` : `<p class="muted small" style="margin:6px 0 0">${readOnly() ? '' : '<button class="btn ghost sm" data-act="editTrip">Definir orçamento</button>'}</p>`}
+    </div>
+    <div class="stat"><span>Previsto no roteiro</span><b>${money(tot.plan, cur)}</b></div>
+    <div class="stat"><span>Média por dia</span><b>${money(exps.length ? tot.gasto / (diffDays(t.start, todayIso()) >= 0 ? diasPassados : nDays(t)) : 0, cur)}</b></div>
+  </div>`;
+  if (t.localCurrency && t.rate) html += `<p class="muted small" style="margin:-2px 4px 12px">Câmbio: 1 ${esc(t.localCurrency)} = ${esc(money(t.rate, cur))}. Valores convertidos para ${esc(cur)}.</p>`;
+  const porCat = {};
+  exps.forEach(e => { porCat[e.cat || 'outro'] = (porCat[e.cat || 'outro'] || 0) + toMain(t, e.amount, e.currency); });
+  const maxCat = Math.max(1, ...Object.values(porCat));
+  if (exps.length) {
+    html += `<div class="card"><h3>Por categoria</h3>${Object.entries(porCat).sort((a, b) => b[1] - a[1]).map(([k, v]) => `
+      <div class="catrow" style="--cat:var(--c-${k})"><span>${esc(CATS[k] || k)}</span><div class="bar"><i style="width:${v / maxCat * 100}%"></i></div><b>${esc(money(v, cur))}</b></div>`).join('')}</div>`;
+    html += `<div class="section-title">Gastos <span>${exps.length}</span></div><div class="list">${exps.map(e => {
+      const d = e.date ? parseD(e.date) : null;
+      return `<button class="row" data-exp="${esc(e.id)}" style="--cat:var(--c-${e.cat || 'outro'})" ${readOnly() ? 'disabled' : ''}><span class="dot"></span>
+        <span class="main"><b>${esc(e.desc || CATS[e.cat] || 'Gasto')}</b><span>${d ? `${d.getDate()}/${d.getMonth() + 1}, ` : ''}${esc(CATS[e.cat] || '')}</span></span>
+        <span class="val">${esc(money(toMain(t, e.amount, e.currency), cur))}${e.currency && e.currency !== cur ? `<small>${esc(money(e.amount, e.currency))}</small>` : ''}</span></button>`;
+    }).join('')}</div>`;
+  } else {
+    html += `<div class="empty" style="padding:32px 12px"><b>Nenhum gasto registrado</b>${readOnly() ? '' : 'Anote cada gasto durante a viagem para acompanhar o orçamento.'}</div>`;
+  }
+  $('#app').innerHTML = html;
+  fab('Gasto', () => formGasto(t, null));
+}
+
+function formGasto(t, e, preset) {
+  const isNew = !e;
+  e = e ? JSON.parse(JSON.stringify(e)) : Object.assign({ id: uid(), amount: 0, currency: t.localCurrency && diffDays(t.start, todayIso()) >= 0 ? t.localCurrency : t.currency, cat: 'comida', desc: '', date: (() => { const i = diffDays(t.start, todayIso()); return i >= 0 && i < nDays(t) ? todayIso() : addDays(t.start, V.day); })() }, preset || {});
+  const curOpts = [t.currency, t.localCurrency].filter(Boolean);
+  const body = `
+    <div class="${curOpts.length > 1 ? 'three' : ''}">
+      <label class="field"><span>Valor</span><input id="gVal" inputmode="decimal" value="${esc(fmtInput(e.amount))}" placeholder="0,00" style="font-size:22px;font-weight:700"></label>
+      ${curOpts.length > 1 ? `<label class="field"><span>Moeda</span><select id="gCur">${curOpts.map(c => `<option ${c === e.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label>` : ''}
+    </div>
+    <p class="hint" id="gConv"></p>
+    <div class="cats" role="radiogroup" aria-label="Categoria">${Object.entries(CATS).map(([k, l]) => `<label style="--cat:var(--c-${k})"><input type="radio" name="gCat" value="${k}" ${e.cat === k ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div>
+    <label class="field"><span>Descrição</span><input id="gDesc" value="${esc(e.desc)}" placeholder="Ex.: Jantar, Uber, ingresso" autocomplete="off"></label>
+    <label class="field"><span>Data</span><input id="gDate" type="date" value="${esc(e.date)}"></label>`;
+  const foot = isNew ? `<button class="btn" id="gSave">Registrar gasto</button>` : `<button class="btn danger" id="gDel" style="flex:0 0 auto">${ICON.trash}</button><button class="btn" id="gSave">Salvar</button>`;
+  sheet(isNew ? 'Novo gasto' : 'Editar gasto', body, foot, sh => {
+    const conv = () => {
+      const c = sh.querySelector('#gCur') ? sh.querySelector('#gCur').value : t.currency;
+      const v = parseMoney(sh.querySelector('#gVal').value);
+      sh.querySelector('#gConv').textContent = c !== t.currency && t.rate && v ? `Equivale a ${money(toMain(t, v, c), t.currency)}` : c !== t.currency && !t.rate ? 'Defina o câmbio em Mais, Editar viagem, para converter.' : '';
+    };
+    conv(); sh.querySelector('#gVal').oninput = conv; if (sh.querySelector('#gCur')) sh.querySelector('#gCur').onchange = conv;
+    sh.querySelector('#gSave').onclick = () => {
+      e.amount = parseMoney(sh.querySelector('#gVal').value);
+      if (!e.amount) { toast('Informe o valor.'); return; }
+      e.currency = sh.querySelector('#gCur') ? sh.querySelector('#gCur').value : t.currency;
+      e.cat = (sh.querySelector('input[name=gCat]:checked') || {}).value || 'outro';
+      e.desc = sh.querySelector('#gDesc').value.trim(); e.date = sh.querySelector('#gDate').value;
+      if (isNew) e.created = Date.now();
+      else if (!t.cloud) { const i = t.expenses.findIndex(x => x.id === e.id); if (i >= 0) t.expenses[i] = e; }
+      closeAll();
+      if (preset) V.tab = 'gastos';
+      Data.putExp(t, e); toast(isNew ? 'Gasto registrado.' : 'Gasto salvo.');
+    };
+    const del = sh.querySelector('#gDel');
+    if (del) del.onclick = () => { if (!confirm('Apagar este gasto?')) return; closeAll(); Data.delExp(t, e.id); };
+  });
+}
+
+/* =================================================================
+   Checklist
+   ================================================================= */
+function renderChecklist(t) {
+  const ck = t.checklist || [];
+  const secs = [...new Set(ck.map(c => c.section))];
+  const feitos = ck.filter(c => c.done).length;
+  let html = header(t, `Checklist, ${feitos} de ${ck.length} prontos`);
+  html += `<div class="stat" style="margin-bottom:6px"><span>Pronto para a viagem</span><b>${ck.length ? Math.round(feitos / ck.length * 100) : 0}%</b><div class="bar"><i style="width:${ck.length ? feitos / ck.length * 100 : 0}%"></i></div></div>`;
+  for (const s of secs) {
+    const its = ck.filter(c => c.section === s);
+    html += `<div class="section-title">${esc(s)}<span>${its.filter(c => c.done).length}/${its.length}</span></div><div class="list">`;
+    html += its.map(c => `<label class="ck ${c.done ? 'on' : ''}"><input type="checkbox" data-ck="${esc(c.id)}" ${c.done ? 'checked' : ''} ${readOnly() ? 'disabled' : ''}><span class="txt">${esc(c.text)}</span>${readOnly() ? '' : `<button class="del" data-ckdel="${esc(c.id)}" aria-label="Remover ${esc(c.text)}">×</button>`}</label>`).join('');
+    if (!readOnly()) html += `<div class="addline"><input data-ckadd="${esc(s)}" placeholder="Adicionar item" enterkeyhint="done"><button class="btn sm ghost" data-ckaddbtn="${esc(s)}">Adicionar</button></div>`;
+    html += `</div>`;
+  }
+  if (!readOnly()) html += `<div style="display:grid;gap:10px;margin-top:18px"><button class="btn ghost" data-act="ckSection">Nova seção</button><button class="btn ghost" data-act="ckReset">Desmarcar tudo</button></div>`;
+  $('#app').innerHTML = html;
+}
+
+/* =================================================================
+   Mais: dados da viagem, compartilhar, PDF
+   ================================================================= */
+function renderMais(t) {
+  let html = header(t, 'Mais opções');
+  if (t.hotel && (t.hotel.name || t.hotel.address)) {
+    const q = t.hotel.address || t.hotel.name;
+    html += `<div class="info"><h4>Hospedagem</h4><p><b>${esc(t.hotel.name)}</b>${t.hotel.address ? '\n' + esc(t.hotel.address) : ''}</p>
+      <a class="maplink" style="margin-top:10px" href="${esc('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q + (t.destination && !q.includes(t.destination) ? ', ' + t.destination : '')))}" target="_blank" rel="noopener">${ICON.pin}Abrir no Maps</a></div>`;
+  }
+  if (t.notes) html += `<div class="info"><h4>Anotações</h4><p>${esc(t.notes)}</p></div>`;
+  if (!readOnly()) html += t.cloud ? `
+    <div class="section-title" style="margin-top:6px">Editando em conjunto</div>
+    <button class="menu-btn" data-act="collabLink"><span class="ico">${ICON.people}</span><span><b>Link de edição</b><span class="sub">Convide mais pessoas para editar</span></span></button>
+    <button class="menu-btn" data-act="collabNew"><span class="ico">${ICON.refresh}</span><span><b>Trocar link de edição</b><span class="sub">O link atual para de funcionar</span></span></button>
+    <div class="section-title">Outras opções</div>` : `
+    <button class="menu-btn" data-act="collab"><span class="ico">${ICON.people}</span><span><b>Editar em conjunto</b><span class="sub">Link para outras pessoas editarem este roteiro</span></span></button>`;
+  html += `
+    <button class="menu-btn" data-act="share"><span class="ico">${ICON.share}</span><span><b>${t.cloud ? 'Link só para visualizar' : 'Compartilhar link'}</b><span class="sub">Quem abrir vê o roteiro, sem poder editar</span></span></button>
+    <button class="menu-btn" data-act="pdf"><span class="ico">${ICON.pdf}</span><span><b>Salvar em PDF ou imprimir</b><span class="sub">Roteiro completo, gastos e checklist</span></span></button>`;
+  if (!readOnly()) html += `
+    <button class="menu-btn" data-act="editTrip"><span class="ico">${ICON.edit}</span><span><b>Editar viagem</b><span class="sub">Destino, datas, orçamento, moedas, hospedagem</span></span></button>
+    <button class="menu-btn" data-act="export"><span class="ico">${ICON.file}</span><span><b>Exportar arquivo</b><span class="sub">Backup para guardar ou abrir em outro aparelho</span></span></button>
+    <button class="menu-btn" data-act="duplicate"><span class="ico">${ICON.copy}</span><span><b>Duplicar viagem</b><span class="sub">Reaproveitar este roteiro em outras datas</span></span></button>
+    <button class="menu-btn danger" data-act="deleteTrip"><span class="ico" style="color:var(--bad)">${ICON.trash}</span><span><b>${t.cloud ? 'Remover ou apagar' : 'Apagar viagem'}</b></span></button>
+    ${myCfg() ? `<button class="menu-btn" data-act="collabSetup"><span class="ico">${ICON.edit}</span><span><b>Configuração do Firebase</b><span class="sub">Projeto ${esc(myCfg().projectId)}</span></span></button>` : ''}`;
+  $('#app').innerHTML = html;
+}
+
+function formViagem(t) {
+  const isNew = !t;
+  const base = t || { id: uid(), name: '', destination: '', start: addDays(todayIso(), 30), end: addDays(todayIso(), 34), currency: 'BRL', localCurrency: '', rate: 0, budget: 0, hotel: { name: '', address: '' }, notes: '', days: {}, expenses: [], checklist: [] };
+  const opts = (sel, withNone) => (withNone ? `<option value="">Nenhuma</option>` : '') + CURRENCIES.map(c => `<option ${c === sel ? 'selected' : ''}>${c}</option>`).join('');
+  const body = `
+    <label class="field"><span>Destino</span><input id="vDest" value="${esc(base.destination)}" placeholder="Ex.: Lisboa, Portugal" autocomplete="off"></label>
+    <label class="field"><span>Nome da viagem (opcional)</span><input id="vName" value="${esc(base.name)}" placeholder="Ex.: Férias em Portugal" autocomplete="off"></label>
+    <div class="two">
+      <label class="field"><span>Ida</span><input id="vStart" type="date" value="${esc(base.start)}"></label>
+      <label class="field"><span>Volta</span><input id="vEnd" type="date" value="${esc(base.end)}"></label>
+    </div>
+    ${isNew ? `<label class="switch"><div class="main">Viagem internacional<small>Inclui passaporte, visto, seguro e adaptador na checklist</small></div><input type="checkbox" id="vIntl"></label>` : ''}
+    <div class="two">
+      <label class="field"><span>Orçamento total</span><input id="vBud" inputmode="decimal" value="${esc(fmtInput(base.budget))}" placeholder="0,00"></label>
+      <label class="field"><span>Moeda principal</span><select id="vCur">${opts(base.currency)}</select></label>
+    </div>
+    <div class="two">
+      <label class="field"><span>Moeda local</span><select id="vLoc">${opts(base.localCurrency, true)}</select></label>
+      <label class="field" id="vRateWrap"><span id="vRateLbl">Câmbio</span><input id="vRate" inputmode="decimal" value="${esc(fmtInput(base.rate))}" placeholder="0,00"></label>
+    </div>
+    <label class="field"><span>Hospedagem</span><input id="vHotel" value="${esc(base.hotel && base.hotel.name)}" placeholder="Nome do hotel ou apartamento" autocomplete="off"></label>
+    <label class="field"><span>Endereço da hospedagem</span><input id="vAddr" value="${esc(base.hotel && base.hotel.address)}" placeholder="Para abrir no Maps" autocomplete="off"></label>
+    <label class="field"><span>Anotações</span><textarea id="vNotes" placeholder="Voos, códigos de reserva, contatos úteis">${esc(base.notes)}</textarea></label>`;
+  sheet(isNew ? 'Nova viagem' : 'Editar viagem', body, `<button class="btn" id="vSave">${isNew ? 'Criar viagem' : 'Salvar'}</button>`, sh => {
+    const upd = () => { const l = sh.querySelector('#vLoc').value, c = sh.querySelector('#vCur').value; sh.querySelector('#vRateWrap').hidden = !l || l === c; sh.querySelector('#vRateLbl').textContent = `1 ${l} vale quantos ${c}?`; };
+    upd(); sh.querySelector('#vLoc').onchange = upd; sh.querySelector('#vCur').onchange = upd;
+    sh.querySelector('#vStart').onchange = e => { const s = e.target.value, en = sh.querySelector('#vEnd'); if (s && (!en.value || en.value < s)) en.value = s; };
+    sh.querySelector('#vSave').onclick = () => {
+      const dest = sh.querySelector('#vDest').value.trim(), start = sh.querySelector('#vStart').value, end = sh.querySelector('#vEnd').value;
+      if (!dest) { toast('Informe o destino.'); return; }
+      if (!start || !end || end < start) { toast('Confira as datas de ida e volta.'); return; }
+      const n = diffDays(start, end) + 1;
+      if (n > 90) { toast('O roteiro pode ter até 90 dias.'); return; }
+      let cortar = null;
+      if (!isNew) {
+        const perdidos = Object.keys(base.days || {}).filter(k => Number(k) >= n && (base.days[k].items || []).length);
+        if (perdidos.length && !confirm(`A viagem ficou menor. As atividades dos dias ${perdidos.map(k => Number(k) + 1).join(', ')} serão apagadas. Continuar?`)) return;
+        if (perdidos.length) cortar = n;
+      }
+      const patch = {
+        destination: dest, name: sh.querySelector('#vName').value.trim(), start, end,
+        currency: sh.querySelector('#vCur').value, localCurrency: sh.querySelector('#vLoc').value === sh.querySelector('#vCur').value ? '' : sh.querySelector('#vLoc').value,
+        rate: parseMoney(sh.querySelector('#vRate').value), budget: parseMoney(sh.querySelector('#vBud').value),
+        hotel: { name: sh.querySelector('#vHotel').value.trim(), address: sh.querySelector('#vAddr').value.trim() }, notes: sh.querySelector('#vNotes').value.trim(),
+      };
+      closeAll();
+      if (isNew) {
+        Object.assign(base, patch); base.checklist = checklistPadrao(sh.querySelector('#vIntl').checked); base.checklist.forEach((c, i) => c.o = i + 1);
+        base.created = Date.now(); DB.trips.push(base); save(); openTrip(base.id);
+      } else Data.setMeta(base, patch, cortar);
+      toast(isNew ? 'Viagem criada. Adicione as atividades de cada dia.' : 'Viagem salva.', 3500);
+    };
+  });
+}
+
+/* ---------- Compartilhar por link (sem servidor: o roteiro vai dentro do link) ---------- */
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+async function pack(obj) {
+  const raw = new TextEncoder().encode(JSON.stringify(obj));
+  if ('CompressionStream' in window) {
+    const buf = await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer();
+    return 'z' + b64u(buf);
+  }
+  let bin = ''; raw.forEach(b => bin += String.fromCharCode(b)); return 'j' + btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+async function unpack(s) {
+  const bytes = unb64u(s.slice(1));
+  const txt = s[0] === 'z' ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text() : new TextDecoder().decode(bytes);
+  return JSON.parse(txt);
+}
+function paraCompartilhar(t) {
+  const c = copiaLocal(t);
+  delete c.created;
+  return { v: 1, t: c };
+}
+async function compartilhar(t) {
+  const incluirGastos = await new Promise(res => {
+    sheet('Compartilhar roteiro', `<p class="hint" style="margin:0 0 14px">O roteiro vai dentro do próprio link. Quem abrir vê tudo e pode salvar uma cópia, mas não altera a sua.</p>
+      <label class="switch"><div class="main">Incluir gastos e orçamento<small>Deixe desligado para mandar só o roteiro</small></div><input type="checkbox" id="sGastos"></label>`,
+      `<button class="btn" id="sGo">${ICON.share}Gerar link</button>`, sh => { sh.querySelector('#sGo').onclick = () => { const v = sh.querySelector('#sGastos').checked; closeSheet(); res(v); }; sh.querySelector('.close').addEventListener('click', () => res(null)); });
+  });
+  if (incluirGastos === null) return;
+  const data = paraCompartilhar(t);
+  if (!incluirGastos) { data.t.expenses = []; data.t.budget = 0; Object.values(data.t.days || {}).forEach(d => (d.items || []).forEach(i => { i.cost = 0; })); }
+  const url = location.href.split('#')[0] + '#r=' + await pack(data);
+  const title = t.name || t.destination;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Roteiro: ' + title, text: `Roteiro: ${title} (${periodo(t)})`, url }); return; } catch (e) { if (e.name === 'AbortError') return; }
+  }
+  try { await navigator.clipboard.writeText(url); toast('Link copiado. Cole no WhatsApp ou e-mail.', 4000); }
+  catch (e) { sheet('Link do roteiro', `<p class="hint" style="margin:0 0 10px">Copie o link abaixo:</p><label class="field"><textarea readonly style="min-height:140px">${esc(url)}</textarea></label>`); }
+  if (url.length > 8000) toast('Roteiro grande: alguns apps cortam links muito longos. Se der problema, use Exportar arquivo.', 6000);
+}
+
+async function abrirCompartilhado() {
+  const m = location.hash.match(/^#r=(.+)$/);
+  if (!m) return false;
+  try {
+    const data = await unpack(m[1]);
+    if (!data || !data.t || !data.t.start) throw new Error();
+    V.shared = data.t; V.shared.id = '__shared'; V.tab = 'roteiro';
+    const idx = diffDays(V.shared.start, todayIso()); V.day = idx >= 0 && idx < nDays(V.shared) ? idx : 0;
+    return true;
+  } catch (e) { toast('Não foi possível abrir esse link de roteiro.', 5000); history.replaceState(null, '', location.pathname); return false; }
+}
+
+/* ---------- PDF / impressão ---------- */
+function montarImpressao(t) {
+  const cur = t.currency, tot = totais(t);
+  let h = `<h1>${esc(t.name || t.destination)}</h1><p class="sub">${esc(t.destination)}${t.name ? '' : ''}, ${esc(periodo(t))}, ${nDays(t)} dias</p>`;
+  if (t.hotel && (t.hotel.name || t.hotel.address)) h += `<p><b>Hospedagem:</b> ${esc(t.hotel.name)}${t.hotel.address ? ', ' + esc(t.hotel.address) : ''}</p>`;
+  if (t.notes) h += `<p style="white-space:pre-wrap"><b>Anotações:</b> ${esc(t.notes)}</p>`;
+  for (let i = 0; i < nDays(t); i++) {
+    const d = parseD(addDays(t.start, i)), dd = (t.days || {})[i] || { items: [] };
+    const its = (dd.items || []).slice().sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+    h += `<h2>Dia ${i + 1}, ${DOWL[d.getDay()]}, ${d.getDate()} de ${MONL[d.getMonth()]}${dd.title ? ': ' + esc(dd.title) : ''}</h2>`;
+    h += its.length ? `<table>${its.map(it => { const m = mapsUrl(t, it); return `<tr><td class="t">${esc(it.time || '')}</td><td><b>${esc(it.title)}</b>${it.place && it.place !== it.title ? `<br><span class="n">${m ? `<a href="${esc(m)}">${esc(it.place)}</a>` : esc(it.place)}</span>` : m ? `<br><span class="n"><a href="${esc(m)}">Ver no mapa</a></span>` : ''}${it.notes ? `<br><span class="n">${esc(it.notes)}</span>` : ''}</td><td class="c">${it.cost ? esc(money(it.cost, it.costCur || cur)) : ''}</td></tr>`; }).join('')}</table>` : `<p class="n">Dia livre</p>`;
+  }
+  if (t.budget || (t.expenses || []).length || tot.plan) {
+    h += `<h2>Orçamento</h2><table>
+      ${t.budget ? `<tr><td>Orçamento</td><td class="c">${esc(money(t.budget, cur))}</td></tr>` : ''}
+      <tr><td>Previsto no roteiro</td><td class="c">${esc(money(tot.plan, cur))}</td></tr>
+      <tr><td>Gasto até agora</td><td class="c">${esc(money(tot.gasto, cur))}</td></tr></table>`;
+  }
+  const ck = t.checklist || [];
+  if (ck.length) {
+    h += `<h2>Checklist</h2><div class="ck-cols">${[...new Set(ck.map(c => c.section))].map(s => `<div><p><b>${esc(s)}</b></p>${ck.filter(c => c.section === s).map(c => `<p>${c.done ? '☑' : '☐'} ${esc(c.text)}</p>`).join('')}</div>`).join('')}</div>`;
+  }
+  $('#print').innerHTML = h;
+}
+
+/* =================================================================
+   Edição em conjunto (Firebase)
+   Viagens locais continuam só neste aparelho. Viagens compartilhadas
+   gravam cada atividade, gasto e item da checklist como um documento
+   separado, e todos veem as mudanças em tempo real.
+   ================================================================= */
+const FB_VER = '10.14.1';
+const CFG_KEY = 'roteiros-firebase-config';
+const RULES = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /trips/{tripId} {
+      allow get, create, update, delete: if request.auth != null && tripId.size() >= 20;
+      allow list: if false;
+      match /{col}/{docId} {
+        allow read, write: if request.auth != null && tripId.size() >= 20;
+      }
+    }
+  }
+}`;
+function myCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch (e) { return null; } }
+function parseCfg(text) {
+  const out = {}; const re = /["']?(apiKey|authDomain|projectId|storageBucket|messagingSenderId|appId)["']?\s*:\s*["']([^"']+)["']/g; let m;
+  while ((m = re.exec(text))) out[m[1]] = m[2];
+  return out.apiKey && out.projectId && out.appId ? out : null;
+}
+const clean = o => JSON.parse(JSON.stringify(o));
+function randomId(n = 24) { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'; const v = crypto.getRandomValues(new Uint8Array(n)); return Array.from(v, x => a[x % a.length]).join(''); }
+const withTimeout = (p, ms, msg) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(msg)), ms))]);
+
+let modsP = null; const apps = new Map();
+function loadMods() {
+  if (window.__FAKE_FB) return Promise.resolve(window.__FAKE_FB);
+  if (!modsP) {
+    const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+    modsP = Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')])
+      .then(([app, auth, fs]) => ({ app, auth, fs }))
+      .catch(e => { modsP = null; throw new Error('Sem conexão para carregar a edição em conjunto.'); });
+  }
+  return modsP;
+}
+/** Conecta ao projeto Firebase da viagem (cada link carrega a própria configuração). */
+async function fbFor(cfg) {
+  const key = cfg.projectId;
+  if (apps.has(key)) return apps.get(key);
+  const p = (async () => {
+    const M = await loadMods();
+    const app = M.app.initializeApp(cfg, 'p_' + key);
+    let db;
+    try { db = M.fs.initializeFirestore(app, { localCache: M.fs.persistentLocalCache({ tabManager: M.fs.persistentMultipleTabManager() }) }); }
+    catch (e) { db = M.fs.getFirestore(app); }
+    const auth = M.auth.getAuth(app);
+    const u = await new Promise(res => { const off = M.auth.onAuthStateChanged(auth, x => { off(); res(x); }); });
+    if (!u) await withTimeout(M.auth.signInAnonymously(auth), 15000, 'Sem conexão com o Firebase.');
+    return { db, fs: M.fs };
+  })();
+  apps.set(key, p);
+  p.catch(() => apps.delete(key));
+  return p;
+}
+function cloudErr(e) {
+  console.error(e);
+  const code = e && e.code || '';
+  toast(code === 'permission-denied' ? 'Sem permissão no Firebase. Confira as regras do banco (Mais, Editar em conjunto, Ajuda).'
+    : code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation' ? 'Ative o login Anônimo no Firebase (Authentication).'
+    : 'Não foi possível salvar online: ' + (e.message || e), 6000);
+}
+
+const META = ['name', 'destination', 'start', 'end', 'currency', 'localCurrency', 'rate', 'budget', 'hotel', 'notes'];
+function rebuildDays(t) {
+  t.days = {};
+  Object.entries(t.dayTitles || {}).forEach(([i, title]) => { if (title) dia(t, i).title = title; });
+  (t._items || []).forEach(it => dia(t, it.day || 0).items.push(it));
+}
+
+/* ---------- gravações: local ou na nuvem ---------- */
+function cloudWrite(t, fn) {
+  fbFor(t.cloud.cfg).then(F => {
+    const tref = F.fs.doc(F.db, 'trips', t.cloud.tripId);
+    return fn(F.fs, tref, F.db);
+  }).catch(cloudErr);
+}
+const Data = {
+  putItem(t, it, day) {
+    if (!t.cloud) { Object.values(t.days || {}).forEach(d => d.items = (d.items || []).filter(x => x.id !== it.id)); dia(t, day).items.push(it); save(); render(); return; }
+    cloudWrite(t, (fs, tref) => fs.setDoc(fs.doc(tref, 'items', it.id), clean({ ...it, day })));
+  },
+  delItem(t, id) {
+    if (!t.cloud) { Object.values(t.days || {}).forEach(d => d.items = (d.items || []).filter(x => x.id !== id)); save(); render(); return; }
+    cloudWrite(t, (fs, tref) => fs.deleteDoc(fs.doc(tref, 'items', id)));
+  },
+  putExp(t, e) {
+    if (!t.cloud) { t.expenses = t.expenses || []; if (!t.expenses.includes(e)) t.expenses.push(e); save(); render(); return; }
+    cloudWrite(t, (fs, tref) => fs.setDoc(fs.doc(tref, 'expenses', e.id), clean(e)));
+  },
+  delExp(t, id) {
+    if (!t.cloud) { t.expenses = t.expenses.filter(x => x.id !== id); save(); render(); return; }
+    cloudWrite(t, (fs, tref) => fs.deleteDoc(fs.doc(tref, 'expenses', id)));
+  },
+  putCk(t, c, silent) {
+    if (!c.o) c.o = Date.now();
+    if (!t.cloud) { if (!t.checklist.includes(c)) t.checklist.push(c); save(); if (!silent) render(); return; }
+    cloudWrite(t, (fs, tref) => fs.setDoc(fs.doc(tref, 'checklist', c.id), clean(c)));
+  },
+  delCk(t, id) {
+    if (!t.cloud) { t.checklist = t.checklist.filter(c => c.id !== id); save(); render(); return; }
+    cloudWrite(t, (fs, tref) => fs.deleteDoc(fs.doc(tref, 'checklist', id)));
+  },
+  resetCk(t) {
+    if (!t.cloud) { t.checklist.forEach(c => c.done = false); save(); render(); return; }
+    cloudWrite(t, (fs, tref, db) => { const b = fs.writeBatch(db); t.checklist.filter(c => c.done).forEach(c => b.update(fs.doc(tref, 'checklist', c.id), { done: false })); return b.commit(); });
+  },
+  setDayTitle(t, i, title) {
+    if (!t.cloud) { dia(t, i).title = title; save(); render(); return; }
+    cloudWrite(t, (fs, tref) => fs.updateDoc(tref, { ['dayTitles.' + i]: title }));
+  },
+  setMeta(t, patch, removeFromDay) {
+    if (!t.cloud) {
+      Object.assign(t, patch);
+      if (removeFromDay != null) Object.keys(t.days || {}).forEach(k => { if (Number(k) >= removeFromDay) delete t.days[k]; });
+      save(); render(); return;
+    }
+    cloudWrite(t, (fs, tref, db) => {
+      const b = fs.writeBatch(db);
+      b.update(tref, clean(patch));
+      if (removeFromDay != null) (t._items || []).filter(it => (it.day || 0) >= removeFromDay).forEach(it => b.delete(fs.doc(tref, 'items', it.id)));
+      return b.commit();
+    });
+  },
+};
+
+/* ---------- ouvir mudanças em tempo real ---------- */
+const subs = new Map();
+let renderTimer = null, renderPending = false;
+function scheduleRender() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(() => {
+    save();
+    const a = document.activeElement;
+    if (a && $('#app').contains(a) && /INPUT|TEXTAREA/.test(a.tagName) && a.value) { renderPending = true; return; }
+    render();
+  }, 60);
+}
+document.addEventListener('focusout', () => { if (renderPending) { renderPending = false; setTimeout(render, 0); } });
+
+function subscribe(t) {
+  if (!t.cloud || subs.has(t.id)) return;
+  subs.set(t.id, []);
+  fbFor(t.cloud.cfg).then(F => {
+    if (!subs.has(t.id)) return;
+    const fs = F.fs, tref = fs.doc(F.db, 'trips', t.cloud.tripId);
+    const state = { meta: {}, items: {}, expenses: {}, checklist: {} };
+    const setSync = md => { state[md.k] = md; t.cloud.pending = Object.values(state).some(x => x.pending); t.cloud.offline = Object.values(state).some(x => x.cache); };
+    const onErr = e => { if (e && e.code === 'permission-denied') { t.cloud.gone = true; scheduleRender(); } else console.error(e); };
+    const un = subs.get(t.id);
+    un.push(fs.onSnapshot(tref, { includeMetadataChanges: true }, s => {
+      setSync({ k: 'meta', pending: s.metadata.hasPendingWrites, cache: s.metadata.fromCache });
+      if (!s.exists()) { if (!s.metadata.fromCache) t.cloud.gone = true; scheduleRender(); return; }
+      const d = s.data(); t.cloud.gone = false;
+      META.forEach(k => { if (d[k] !== undefined) t[k] = d[k]; });
+      t.dayTitles = d.dayTitles || {}; rebuildDays(t); scheduleRender();
+    }, onErr));
+    const col = (name, apply) => un.push(fs.onSnapshot(fs.collection(tref, name), { includeMetadataChanges: true }, qs => {
+      setSync({ k: name, pending: qs.metadata.hasPendingWrites, cache: qs.metadata.fromCache });
+      apply(qs.docs.map(x => x.data())); scheduleRender();
+    }, onErr));
+    col('items', list => { t._items = list; rebuildDays(t); });
+    col('expenses', list => { t.expenses = list; });
+    col('checklist', list => { t.checklist = list.sort((a, b) => (a.o || 0) - (b.o || 0)); });
+  }).catch(e => { subs.delete(t.id); t.cloud.offline = true; console.warn(e); });
+}
+function unsubscribe(t) { (subs.get(t.id) || []).forEach(f => { try { f(); } catch (e) { } }); subs.delete(t.id); }
+
+/* ---------- transformar uma viagem local em compartilhada ---------- */
+function linkEdicao(t) {
+  const c = t.cloud.cfg;
+  const cfg = b64u(new TextEncoder().encode(JSON.stringify({ apiKey: c.apiKey, authDomain: c.authDomain, projectId: c.projectId, appId: c.appId })));
+  return location.href.split('#')[0] + '#e=' + t.cloud.tripId + '~' + cfg;
+}
+async function gravarTudo(F, tid, t) {
+  const fs = F.fs, tref = fs.doc(F.db, 'trips', tid);
+  const ops = [];
+  const dayTitles = {}; Object.entries(t.days || {}).forEach(([i, d]) => { if (d.title) dayTitles[i] = d.title; });
+  const meta = {}; META.forEach(k => meta[k] = t[k] ?? ''); meta.dayTitles = dayTitles;
+  delete meta.createdAt;
+  ops.push(['set', tref, clean(meta), true]);
+  Object.entries(t.days || {}).forEach(([i, d]) => (d.items || []).forEach(it => ops.push(['set', fs.doc(tref, 'items', it.id), clean({ ...it, day: Number(i) })])));
+  (t.expenses || []).forEach(e => ops.push(['set', fs.doc(tref, 'expenses', e.id), clean(e)]));
+  (t.checklist || []).forEach((c, i) => ops.push(['set', fs.doc(tref, 'checklist', c.id), clean({ ...c, o: c.o || i + 1 })]));
+  for (let i = 0; i < ops.length; i += 400) {
+    const b = fs.writeBatch(F.db);
+    ops.slice(i, i + 400).forEach(([op, ref, data, isMeta]) => b.set(ref, isMeta ? { ...data, createdAt: fs.serverTimestamp() } : data));
+    await withTimeout(b.commit(), 20000, 'Sem conexão. Tente de novo com internet.');
+  }
+}
+async function apagarTudo(F, tid, t) {
+  const fs = F.fs, tref = fs.doc(F.db, 'trips', tid);
+  const refs = [];
+  for (const name of ['items', 'expenses', 'checklist']) { const qs = await fs.getDocs(fs.collection(tref, name)); qs.docs.forEach(d => refs.push(d.ref)); }
+  refs.push(tref);
+  for (let i = 0; i < refs.length; i += 400) { const b = fs.writeBatch(F.db); refs.slice(i, i + 400).forEach(r => b.delete(r)); await withTimeout(b.commit(), 20000, 'Sem conexão.'); }
+}
+
+async function tornarCompartilhado(t) {
+  const cfg = myCfg();
+  if (!cfg) { configurarFirebase(() => tornarCompartilhado(trip())); return; }
+  const wait = sheet('Preparando o link', `<p class="hint" style="margin:0">Enviando o roteiro para o Firebase…</p>`);
+  try {
+    const F = await fbFor(cfg);
+    const tid = randomId(24);
+    await gravarTudo(F, tid, t);
+    t.cloud = { tripId: tid, cfg };
+    t._items = Object.entries(t.days || {}).flatMap(([i, d]) => (d.items || []).map(it => ({ ...it, day: Number(i) })));
+    t.dayTitles = {}; Object.entries(t.days || {}).forEach(([i, d]) => { if (d.title) t.dayTitles[i] = d.title; });
+    t.checklist.forEach((c, i) => c.o = c.o || i + 1);
+    save(); closeAll(); subscribe(t); render();
+    mostrarLinkEdicao(t, true);
+  } catch (e) { closeAll(); cloudErr(e); }
+}
+
+function mostrarLinkEdicao(t, novo) {
+  const url = linkEdicao(t);
+  sheet(novo ? 'Pronto para editar em conjunto' : 'Link de edição', `
+    <p class="hint" style="margin:0 0 14px">Quem abrir este link entra no roteiro e pode editar tudo: atividades, gastos e checklist. As mudanças aparecem para todos na hora.</p>
+    <button class="btn block" id="lShare">${ICON.share}Enviar link</button>
+    <button class="btn ghost block" id="lCopy" style="margin-top:10px">${ICON.copy}Copiar link</button>
+    <p class="hint" style="margin:16px 0 0">Mande só para quem deve editar. Se o link parar em mãos erradas, use <b>Trocar link de edição</b> em Mais.</p>`, '', sh => {
+    const copiar = async () => { try { await navigator.clipboard.writeText(url); toast('Link copiado.'); } catch (e) { sheet('Link', `<label class="field"><textarea readonly style="min-height:150px">${esc(url)}</textarea></label>`); } };
+    sh.querySelector('#lCopy').onclick = copiar;
+    sh.querySelector('#lShare').onclick = async () => {
+      if (navigator.share) { try { await navigator.share({ title: 'Roteiro: ' + (t.name || t.destination), text: `Vamos montar juntos o roteiro de ${t.name || t.destination}:`, url }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+      copiar();
+    };
+  });
+}
+
+async function entrarPorLink(tid, cfg) {
+  const ex = DB.trips.find(x => x.cloud && x.cloud.tripId === tid);
+  if (ex) { subscribe(ex); openTrip(ex.id); return; }
+  const wait = sheet('Abrindo roteiro', `<p class="hint" style="margin:0">Conectando…</p>`);
+  try {
+    const F = await fbFor(cfg);
+    const tref = F.fs.doc(F.db, 'trips', tid);
+    const s = await withTimeout(F.fs.getDoc(tref), 20000, 'Sem conexão. Abra o link de novo com internet.');
+    if (!s.exists()) throw new Error('Este roteiro não existe mais ou o link foi trocado.');
+    const d = s.data();
+    const t = { id: 'c_' + tid, cloud: { tripId: tid, cfg }, days: {}, expenses: [], checklist: [], _items: [], dayTitles: d.dayTitles || {}, created: Date.now() };
+    META.forEach(k => t[k] = d[k]);
+    rebuildDays(t);
+    DB.trips.push(t); save(); closeAll(); subscribe(t); openTrip(t.id);
+    toast('Você entrou no roteiro. Tudo que mudar aqui vale para todos.', 4500);
+  } catch (e) { closeAll(); toast(e.code === 'permission-denied' ? 'Sem permissão para abrir este roteiro.' : e.message, 6000); }
+}
+
+function configurarFirebase(depois) {
+  sheet('Ativar edição em conjunto', `
+    <p class="hint" style="margin:0 0 14px">Você faz isso uma vez só. Quem receber seus links não precisa configurar nada.</p>
+    <details class="help" open style="background:var(--surface);border-radius:14px;padding:12px 16px;margin-bottom:12px"><summary style="font-weight:650;cursor:pointer">Passo a passo no Firebase (gratuito)</summary>
+      <ol style="padding-left:20px;margin:10px 0 0;font-size:15px">
+        <li style="margin-bottom:8px">Entre em <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a> e crie um projeto (pode desligar o Analytics).</li>
+        <li style="margin-bottom:8px">Em <b>Criação → Authentication</b>, clique em Vamos começar, escolha <b>Anônimo</b> e ative.</li>
+        <li style="margin-bottom:8px">Em <b>Criação → Firestore Database</b>, crie o banco (local: <b>southamerica-east1</b>, modo de produção).</li>
+        <li style="margin-bottom:8px">Na aba <b>Regras</b> do Firestore, apague tudo, cole as regras abaixo e clique em <b>Publicar</b>.</li>
+        <li>Na engrenagem, <b>Configurações do projeto → Seus apps</b>, clique no ícone <b>&lt;/&gt;</b> (Web), registre o app e copie o bloco <b>firebaseConfig</b>.</li>
+      </ol></details>
+    <button class="btn ghost block" id="fRules" style="margin-bottom:14px">${ICON.copy}Copiar regras do Firestore</button>
+    <label class="field"><span>Cole aqui o firebaseConfig</span><textarea id="fCfg" placeholder="const firebaseConfig = { apiKey: ..., projectId: ..., appId: ... };" style="font-family:ui-monospace,monospace;font-size:13px">${esc(myCfg() ? JSON.stringify(myCfg(), null, 1) : '')}</textarea></label>`,
+    `<button class="btn" id="fSave">Salvar e continuar</button>`, sh => {
+      sh.querySelector('#fRules').onclick = async () => { try { await navigator.clipboard.writeText(RULES); toast('Regras copiadas.'); } catch (e) { sheet('Regras', `<label class="field"><textarea readonly style="min-height:240px;font-family:ui-monospace,monospace;font-size:12px">${esc(RULES)}</textarea></label>`); } };
+      sh.querySelector('#fSave').onclick = () => {
+        const cfg = parseCfg(sh.querySelector('#fCfg').value);
+        if (!cfg) { toast('Não reconheci a configuração. Cole o bloco inteiro do firebaseConfig.', 5000); return; }
+        localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+        closeSheet(); toast('Firebase configurado.'); depois && depois();
+      };
+    });
+}
+
+async function trocarLink(t) {
+  if (!confirm('Criar um link novo? Quem tem o link atual perde o acesso, e você precisa mandar o novo para quem deve continuar editando.')) return;
+  sheet('Trocando o link', `<p class="hint" style="margin:0">Copiando o roteiro…</p>`);
+  try {
+    const F = await fbFor(t.cloud.cfg), old = t.cloud.tripId, tid = randomId(24);
+    await gravarTudo(F, tid, t);
+    unsubscribe(t); t.cloud = { ...t.cloud, tripId: tid, gone: false }; save(); subscribe(t);
+    await apagarTudo(F, old, t).catch(console.warn);
+    closeAll(); render(); mostrarLinkEdicao(t, false);
+  } catch (e) { closeAll(); cloudErr(e); }
+}
+async function removerCompartilhada(t, paraTodos) {
+  if (paraTodos) {
+    if (!confirm('Apagar este roteiro para todos que têm o link? Isso não pode ser desfeito.')) return;
+    try { const F = await fbFor(t.cloud.cfg); await apagarTudo(F, t.cloud.tripId, t); } catch (e) { cloudErr(e); return; }
+  }
+  unsubscribe(t); DB.trips = DB.trips.filter(x => x.id !== t.id); save(); goHome();
+  toast(paraTodos ? 'Roteiro apagado para todos.' : 'Roteiro removido deste aparelho. Os outros continuam com acesso.', 4500);
+}
+function copiaLocal(t, nome) {
+  const c = JSON.parse(JSON.stringify(t)); delete c.cloud; delete c._items; delete c.dayTitles;
+  c.id = uid(); c.created = Date.now(); if (nome) c.name = nome;
+  return c;
+}
+
+/* =================================================================
+   Eventos
+   ================================================================= */
+document.addEventListener('click', async e => {
+  const t = trip();
+  const el = e.target.closest('[data-act], [data-open], [data-day], [data-edit], [data-done], [data-exp], [data-ckdel], [data-ckaddbtn]');
+  if (!el) return;
+  if (el.dataset.open) { openTrip(el.dataset.open); return; }
+  if (el.dataset.day !== undefined && el.classList.contains('daychip')) { V.day = Number(el.dataset.day); render(); return; }
+  if (el.dataset.edit && !readOnly()) { const it = Object.values(t.days || {}).flatMap(d => d.items || []).find(x => x.id === el.dataset.edit); if (it) formItem(t, it); return; }
+  if (el.dataset.done) {
+    const day = Object.entries(t.days || {}).find(([, d]) => (d.items || []).some(x => x.id === el.dataset.done));
+    if (day) { const it = day[1].items.find(x => x.id === el.dataset.done); const c = { ...it, done: !it.done }; delete c.day; if (!t.cloud) it.done = c.done; Data.putItem(t, t.cloud ? c : it, Number(day[0])); }
+    return;
+  }
+  if (el.dataset.exp) { const x = (t.expenses || []).find(y => y.id === el.dataset.exp); if (x) formGasto(t, x); return; }
+  if (el.dataset.ckdel) { e.preventDefault(); Data.delCk(t, el.dataset.ckdel); return; }
+  if (el.dataset.ckaddbtn) { addCk(t, el.dataset.ckaddbtn); return; }
+  switch (el.dataset.act) {
+    case 'home': goHome(); break;
+    case 'newTrip': formViagem(null); break;
+    case 'import': importar(); break;
+    case 'dayTitle': formDia(t); break;
+    case 'editTrip': formViagem(t); break;
+    case 'share': compartilhar(t); break;
+    case 'pdf': montarImpressao(t); setTimeout(() => window.print(), 50); break;
+    case 'export': exportar(t); break;
+    case 'duplicate': {
+      const c = copiaLocal(t, (t.name || t.destination) + ' (cópia)'); c.expenses = [];
+      Object.values(c.days || {}).forEach(d => (d.items || []).forEach(i => { i.id = uid(); i.done = false; })); (c.checklist || []).forEach(k => { k.id = uid(); k.done = false; });
+      DB.trips.push(c); save(); openTrip(c.id); toast('Viagem duplicada. Ajuste as datas em Mais, Editar viagem.', 4000); break;
+    }
+    case 'deleteTrip':
+      if (t.cloud) { opcoesRemover(t); break; }
+      if (confirm(`Apagar a viagem "${t.name || t.destination}"? Isso não pode ser desfeito.`)) { DB.trips = DB.trips.filter(x => x.id !== t.id); save(); goHome(); toast('Viagem apagada.'); }
+      break;
+    case 'saveShared': {
+      const c = copiaLocal(V.shared);
+      DB.trips.push(c); save(); V.shared = null; history.replaceState(null, '', location.pathname); openTrip(c.id); toast('Roteiro salvo nas suas viagens.'); break;
+    }
+    case 'ckSection': {
+      const nome = prompt('Nome da nova seção:', 'Outros'); if (!nome) break;
+      Data.putCk(t, { id: uid(), section: nome.trim(), text: 'Novo item', done: false }); break;
+    }
+    case 'collab': tornarCompartilhado(t); break;
+    case 'collabLink': mostrarLinkEdicao(t); break;
+    case 'collabNew': trocarLink(t); break;
+    case 'collabSetup': configurarFirebase(); break;
+    case 'keepLocal': { const c = copiaLocal(t); unsubscribe(t); DB.trips = DB.trips.filter(x => x.id !== t.id); DB.trips.push(c); save(); openTrip(c.id); toast('Cópia guardada só neste aparelho.'); break; }
+    case 'ckReset': if (confirm('Desmarcar todos os itens da checklist?')) Data.resetCk(t); break;
+  }
+});
+document.addEventListener('change', e => {
+  const t = trip();
+  if (e.target.dataset.ck) { const c = t.checklist.find(x => x.id === e.target.dataset.ck); if (c) { c.done = e.target.checked; e.target.closest('.ck').classList.toggle('on', c.done); updateCkHeader(t); Data.putCk(t, c, true); } }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.ckadd) { e.preventDefault(); addCk(trip(), e.target.dataset.ckadd); } });
+function addCk(t, sec) {
+  const inp = document.querySelector(`[data-ckadd="${CSS.escape(sec)}"]`); const v = (inp.value || '').trim(); if (!v) return;
+  Data.putCk(t, { id: uid(), section: sec, text: v, done: false });
+  const again = document.querySelector(`[data-ckadd="${CSS.escape(sec)}"]`); if (again) again.focus();
+}
+function updateCkHeader(t) {
+  const ck = t.checklist, f = ck.filter(c => c.done).length;
+  const sub = document.querySelector('.top h1 small'); if (sub) sub.textContent = `Checklist, ${f} de ${ck.length} prontos`;
+  const st = document.querySelector('.stat b'); if (st) st.textContent = (ck.length ? Math.round(f / ck.length * 100) : 0) + '%';
+  const bar = document.querySelector('.stat .bar i'); if (bar) bar.style.width = (ck.length ? f / ck.length * 100 : 0) + '%';
+  document.querySelectorAll('.section-title').forEach(h => { const s = h.firstChild.textContent; const its = ck.filter(c => c.section === s); const sp = h.querySelector('span'); if (sp) sp.textContent = `${its.filter(c => c.done).length}/${its.length}`; });
+}
+
+function exportar(t) {
+  const blob = new Blob([JSON.stringify({ app: 'roteiros', v: 1, trip: copiaLocal(t) }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `roteiro-${(t.destination || 'viagem').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w]+/g, '-').toLowerCase()}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Arquivo exportado.');
+}
+function importar() {
+  const inp = $('#importInput'); inp.value = '';
+  inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    try {
+      const d = JSON.parse(await f.text());
+      const t = d.trip || d; if (!t.start || !t.end) throw new Error();
+      t.id = uid(); DB.trips.push(t); save(); openTrip(t.id); toast('Viagem importada.');
+    } catch (err) { toast('Esse arquivo não é um roteiro exportado por este app.', 5000); }
+  };
+  inp.click();
+}
+
+async function lerLinkEdicao() {
+  const m = location.hash.match(/^#e=([A-Za-z0-9]{20,})~([A-Za-z0-9_-]+)$/);
+  if (!m) return false;
+  history.replaceState(null, '', location.pathname + location.search);
+  let cfg; try { cfg = JSON.parse(new TextDecoder().decode(unb64u(m[2]))); } catch (e) { toast('Link de edição inválido.'); return true; }
+  await entrarPorLink(m[1], cfg);
+  return true;
+}
+window.addEventListener('hashchange', async () => { if (await lerLinkEdicao()) return; if (await abrirCompartilhado()) render(); });
+window.addEventListener('beforeprint', () => { const t = trip(); if (t) montarImpressao(t); });
+
+(async () => {
+  DB.trips.filter(t => t.cloud).forEach(t => { rebuildDaysIfNeeded(t); subscribe(t); });
+  if (await lerLinkEdicao()) return;
+  await abrirCompartilhado(); render();
+})();
+function rebuildDaysIfNeeded(t) { if (t._items) rebuildDays(t); }
+</script>
+</body>
+</html>
